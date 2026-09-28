@@ -1,0 +1,81 @@
+package HospitalManagementSystem;
+
+import java.util.Scanner;
+import java.sql.*;
+
+public class Patient {
+    private Connection connection;
+    private Scanner scanner;
+
+    public Patient(Connection connection,Scanner scanner){
+        this.connection = connection;
+        this.scanner = scanner;
+    }
+
+
+    public void addPatient(){
+        System.out.println("Enter Patient Name: ");
+        String name = scanner.next();
+        System.out.print("Enter Patient Age: ");
+        int age = scanner.nextInt();
+        System.out.println("Enter Patient Gender: ");
+        String gender = scanner.next();
+
+        try {
+            String query = "INSERT INTO patients(name,age,gender) VALUES  (?,?,?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1,name);
+            preparedStatement.setInt(2,age);
+            preparedStatement.setString(2,gender);
+            int affectedRows = preparedStatement.executeUpdate();
+            if(affectedRows>0){
+                System.out.println("Patient added successfully!!");
+            }
+            else{
+                System.out.println("Patient could not be added");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void viewPatients(){
+        try {
+            String query = "SELECT * FROM patients";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            System.out.println("Patients: ");
+            System.out.println("+------------+--------------------+--------+----------+");
+            System.out.println("| Patient Id | Name               | Age    | Gender   |");
+            System.out.println("+------------+--------------------+--------+----------+");
+            while(resultSet.next()){
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                int age = resultSet.getInt("age");
+                String gender = resultSet.getString("gender");
+                System.out.printf("|%-12s|%-20s|%-8s|%-10s|\n",id,name,age,gender);
+                System.out.println("+------------+--------------------+--------+----------+");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public boolean getPatientById(int id){
+        try {
+            String query = "SELECT * FROM patients WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                return true;
+            }else{
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}
