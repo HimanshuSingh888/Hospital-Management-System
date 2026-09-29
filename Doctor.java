@@ -4,12 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
+
 
 public class Doctor {
     private Connection connection;
 
-    public Doctor(Connection connection,Scanner scanner){
+    public Doctor(Connection connection){
         this.connection = connection;
     }
 
@@ -27,7 +27,7 @@ public class Doctor {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 String specialization = resultSet.getString("specialization");
-                System.out.printf("|%-12s|%-20s|%-19s|\n",id,name,specialization);
+                System.out.printf("| %-10s | %-18s | %-17s |\n",id,name,specialization);
                 System.out.println("+------------+--------------------+-------------------+");
             }
         } catch (SQLException e) {
@@ -40,6 +40,7 @@ public class Doctor {
         try {
             String query = "SELECT * FROM doctors WHERE id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
                 return true;
