@@ -7,13 +7,16 @@ public class Patient {
     private Connection connection;
     private Scanner scanner;
 
-    public Patient(Connection connection,Scanner scanner){
+    public Patient(Connection connection, Scanner scanner) {
         this.connection = connection;
         this.scanner = scanner;
     }
 
+    public Patient(Connection connection) {
+        this.connection = connection;
+    }
 
-    public void addPatient(){
+    public void addPatient() {
         System.out.print("Enter Patient Name: ");
         String name = scanner.next();
         System.out.print("Enter Patient Age: ");
@@ -24,14 +27,13 @@ public class Patient {
         try {
             String query = "INSERT INTO patients(name,age,gender) VALUES  (?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1,name);
-            preparedStatement.setInt(2,age);
-            preparedStatement.setString(3,gender);
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, age);
+            preparedStatement.setString(3, gender);
             int affectedRows = preparedStatement.executeUpdate();
-            if(affectedRows>0){
+            if (affectedRows > 0) {
                 System.out.println("Patient added successfully!!");
-            }
-            else{
+            } else {
                 System.out.println("Patient could not be added");
             }
         } catch (SQLException e) {
@@ -39,8 +41,27 @@ public class Patient {
         }
     }
 
+    public boolean addPatient(String name, int age, String gender) {
+        try {
+            String query = "INSERT INTO patients(name, age, gender) VALUES (?, ?, ?)";
 
-    public void viewPatients(){
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, age);
+            preparedStatement.setString(3, gender);
+
+            int affectedRows = preparedStatement.executeUpdate();
+
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void viewPatients() {
         try {
             String query = "SELECT * FROM patients";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -49,12 +70,12 @@ public class Patient {
             System.out.println("+------------+--------------------+--------+----------+");
             System.out.println("| Patient Id | Name               | Age    | Gender   |");
             System.out.println("+------------+--------------------+--------+----------+");
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 int age = resultSet.getInt("age");
                 String gender = resultSet.getString("gender");
-                System.out.printf("| %-10s | %-18s | %-6s | %-8s |\n",id,name,age,gender);
+                System.out.printf("| %-10s | %-18s | %-6s | %-8s |\n", id, name, age, gender);
                 System.out.println("+------------+--------------------+--------+----------+");
             }
         } catch (SQLException e) {
@@ -62,16 +83,15 @@ public class Patient {
         }
     }
 
-
-    public boolean getPatientById(int id){
+    public boolean getPatientById(int id) {
         try {
             String query = "SELECT * FROM patients WHERE id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         } catch (SQLException e) {
